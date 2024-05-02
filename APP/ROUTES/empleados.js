@@ -51,5 +51,17 @@ router.delete('/:id',function(req,res){
 })
 
 
+router.get('/listar_empleados/areas',function(req,res){
+
+    controllerbd.listar_empleados_areas(req,res);
+
+})
+
+router.get('/listar_empleados/areas/:area',function(req,res){
+
+    controllerbd.listar_empleados_area_especifica(req,res);
+
+})
+
 //exportamos la rutas para que puedan ser usadas
 module.exports=router

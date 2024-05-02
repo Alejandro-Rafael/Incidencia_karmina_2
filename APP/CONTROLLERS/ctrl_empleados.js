@@ -123,6 +123,35 @@ module.exports={
                 res.json(result);
             }
         })
+    },
+
+    listar_empleados_areas:(req,res)=>{
+
+        mysql.query(`select nombres, apellido_p,apellido_m,puesto,num_nomina,nombre_de_area as area_asignada from empleados inner join areas_hotel on empleados.area_h=areas_hotel.id_area`, function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+        
+    },
+
+    listar_empleados_area_especifica:(req,res)=>{
+
+        let area_empleado=req.params.area;
+
+        mysql.query(`select nombres, apellido_p,apellido_m,puesto,num_nomina,nombre_de_area as area_asignada from empleados inner join areas_hotel on empleados.area_h=areas_hotel.id_area where areas_hotel.id_area=${area_empleado}`,function(err,results,fields){
+            
+            if(err){
+                res.json(res);
+            }else{
+                res.json(results);
+            }
+
+        })
+
+
     }
     
 }

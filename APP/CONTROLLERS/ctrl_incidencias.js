@@ -129,6 +129,29 @@ module.exports={
                 res.json(result);
             }
         })
+    },
+
+    listar_tipos_incidencias_areas:(req,res)=>{
+        mysql.query('select tipo_incidencia, descripcion, nombre_de_area as area_asignada from tipos_incidencias inner join areas_hotel on tipos_incidencias.area=areas_hotel.id_area', function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+    },
+
+    listar_tipos_incidencias_area_especifica:(req,res)=>{
+
+        let area_incidencia=req.params.area;
+
+        mysql.query(`select tipo_incidencia, descripcion, nombre_de_area as area_asignada from tipos_incidencias inner join areas_hotel on tipos_incidencias.area=areas_hotel.id_area where areas_hotel.id_area=${area_incidencia}`, function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
     }
 
 

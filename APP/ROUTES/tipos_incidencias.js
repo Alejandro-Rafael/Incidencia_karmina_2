@@ -54,5 +54,19 @@ router.delete('/:nom_inci',function(req,res){
 
 })
 
+
+router.get('/listar_incidencias/areas',function(req,res){
+
+    controllerbd.listar_tipos_incidencias_areas(req,res);
+
+})
+
+
+router.get('/listar_incidencias/areas/:area',function(req,res){
+
+    controllerbd.listar_tipos_incidencias_area_especifica(req,res);
+
+})
+
 //exportamos la rutas para que puedan ser usadas
 module.exports=router
