@@ -72,6 +72,27 @@ module.exports={
         
         let res_1=req.params.res;
 
+        if(res_1=="todos"){
+
+            mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
+            reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
+            reportes_clientes.date_asignacion_respon,reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
+            reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, 
+            empleado_2.apellido_p as cierr_p, empleado_2.apellido_m as cierr_m, empleado_2.nombres as cierr_n
+            FROM (((reportes_clientes
+            LEFT JOIN empleados as empleado_1 ON empleado_1.id_empleado= reportes_clientes.responsable)
+            LEFT JOIN empleados as empleado_2 ON empleado_2.id_empleado=reportes_clientes.nom_responsable_cierre)
+            INNER JOIN areas_hotel ON areas_hotel.id_area = reportes_clientes.area)`,function(err,result,fields){
+                if(err){
+                    res.json(err);
+                }else{
+                    res.json(result);
+                }
+            })
+
+
+        }else{
+
             mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
             reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
             reportes_clientes.date_asignacion_respon,reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
@@ -88,6 +109,10 @@ module.exports={
                 }
             })
 
+
+        }
+
+            
 
         
         
