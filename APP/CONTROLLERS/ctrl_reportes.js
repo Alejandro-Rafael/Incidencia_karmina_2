@@ -22,7 +22,7 @@ module.exports={
         let em_vacio=0;
         let time_2=req.body.time_2;
         let observaciones=req.body.observaciones;
-        mysql.query(`insert into reportes_clientes (fecha_hora_report, numero_habitacion, problema, observaciones, estado, area, hora_alta, responsable, date_asignacion_respon, hora_proceso, hora_cierre, hora_inconcluso, comentarios, nom_responsable_cierre) values ('${time_2}', ${num_room},'${Incidencia}','${observaciones}','${estado}',${area},'${time}',${em_vacio},'${vacio}','${vacio}','${vacio}','${vacio}','${vacio}',${em_vacio})`, function(err,result,fields){
+        mysql.query(`insert into reportes_clientes (fecha_hora_report, numero_habitacion, problema, observaciones, estado, area, hora_alta, responsable,  hora_proceso, hora_cierre, hora_inconcluso, comentarios, nom_responsable_cierre) values ('${time_2}', ${num_room},'${Incidencia}','${observaciones}','${estado}',${area},'${time}',${em_vacio},'${vacio}','${vacio}','${vacio}','${vacio}',${em_vacio})`, function(err,result,fields){
             if(err){
                 res.json(err);
             }
@@ -55,7 +55,7 @@ module.exports={
         let empleado=req.body.id_empleado;
         let tiempo=req.body.tiempo;
         let estado=req.body.estatus;
-        mysql.query(`UPDATE reportes_clientes SET responsable = ${empleado}, date_asignacion_respon='${tiempo}',estado='${estado}', hora_proceso='${tiempo}' WHERE id_report = ${id_reporte}`,function(err,result,fields){
+        mysql.query(`UPDATE reportes_clientes SET responsable = ${empleado}, estado='${estado}', hora_proceso='${tiempo}' WHERE id_report = ${id_reporte}`,function(err,result,fields){
             if(err){
                 res.json(err);
             }else{
@@ -76,7 +76,7 @@ module.exports={
 
             mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
             reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
-            reportes_clientes.date_asignacion_respon,reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
+            reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
             reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, 
             empleado_2.apellido_p as cierr_p, empleado_2.apellido_m as cierr_m, empleado_2.nombres as cierr_n
             FROM (((reportes_clientes
@@ -95,7 +95,7 @@ module.exports={
 
             mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
             reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
-            reportes_clientes.date_asignacion_respon,reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
+            reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
             reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, 
             empleado_2.apellido_p as cierr_p, empleado_2.apellido_m as cierr_m, empleado_2.nombres as cierr_n
             FROM (((reportes_clientes
@@ -116,27 +116,6 @@ module.exports={
 
         
         
-    },
-
-    //este controlador permite mostrar los reportes asignados a cada empleado
-    listar_reportes_empleado:(req,res)=>{
-
-        //recibe por parametro el id del empleado
-        let id_empleado=req.params.empleado;
-
-        mysql.query(`SELECT  reportes_clientes.id_report, reportes_clientes.numero_habitacion, 
-        reportes_clientes.problema,  reportes_clientes.observaciones ,empleados.apellido_p, empleados.apellido_m, empleados.nombres, 
-        reportes_clientes.estado
-        FROM ((reportes_clientes
-        INNER JOIN empleados ON reportes_clientes.responsable = empleados.id_empleado)
-        INNER JOIN areas_hotel ON reportes_clientes.area = areas_hotel.id_area) where empleados.id_empleado=${id_empleado} && estado='en proceso' `,function(err,result,fields){
-            if(err){
-                res.json(err);
-            }else{
-                res.json(result);
-            }
-        })
-
     },
 
     //este controlador permite actualizar un reporte a cerrado o inconcluso
@@ -179,7 +158,7 @@ module.exports={
 
     obtener_folio:(req,res)=>{
         let condicion=req.params.condicion;
-        mysql.query(`select id_report from reportes_clientes where ${condicion}`, function(err,result,fields){
+        mysql.query(`select reportes_clientes.id_report from reportes_clientes where ${condicion}`, function(err,result,fields){
             if(err){
                 res.json(err);
             }else{
@@ -206,18 +185,38 @@ module.exports={
 
         //recibe por parametro el area 
         let area=req.params.area;
-        mysql.query(`SELECT  reportes_clientes.id_report, reportes_clientes.numero_habitacion, 
-        reportes_clientes.problema,  reportes_clientes.observaciones ,empleados.apellido_p, empleados.apellido_m, empleados.nombres, 
-        reportes_clientes.estado
-        FROM ((reportes_clientes
-        INNER JOIN empleados ON reportes_clientes.responsable = empleados.id_empleado)
-        INNER JOIN areas_hotel ON reportes_clientes.area = areas_hotel.id_area) where areas_hotel.id_area=${area} && reportes_clientes.estado='En proceso'`, function(err,result,fields){
+
+        if(area=="todos"){
+
+            mysql.query(`SELECT  reportes_clientes.id_report, reportes_clientes.numero_habitacion, 
+            reportes_clientes.problema,  reportes_clientes.observaciones , areas_hotel.nombre_de_area,areas_hotel.id_area ,empleados.apellido_p, empleados.apellido_m, empleados.nombres, 
+            reportes_clientes.estado
+            FROM ((reportes_clientes
+            INNER JOIN empleados ON reportes_clientes.responsable = empleados.id_empleado)
+            INNER JOIN areas_hotel ON reportes_clientes.area = areas_hotel.id_area) where reportes_clientes.estado='En proceso'  order by areas_hotel.nombre_de_area `, function(err,result,fields){
             if(err){
                 res.json(err);
             }else{
                 res.json(result);
             }
         })
+
+        }else{
+
+            mysql.query(`SELECT  reportes_clientes.id_report, reportes_clientes.numero_habitacion, 
+            reportes_clientes.problema,  reportes_clientes.observaciones ,empleados.apellido_p, empleados.apellido_m, empleados.nombres
+            FROM ((reportes_clientes
+            INNER JOIN empleados ON reportes_clientes.responsable = empleados.id_empleado)
+            INNER JOIN areas_hotel ON reportes_clientes.area = areas_hotel.id_area) where areas_hotel.id_area=${area} && reportes_clientes.estado='En proceso'`, function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+
+        }
+        
 
     },
 
@@ -230,6 +229,21 @@ module.exports={
                 res.json(result);
             }
         })
+
+    },
+
+    validar_num_room:(req,res)=>{
+
+        let num_room=req.params.num_room;
+
+        mysql.query(`select count(numero_habitacion) as coincidencias from habitaciones where numero_habitacion=${num_room}`, function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+
 
     }
 

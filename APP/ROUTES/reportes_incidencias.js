@@ -15,13 +15,6 @@ router.get('/monitoreo_reportes/:res',function(req,res){
 
 })
 
-//esta ruta de tipo "get" necesita un "empleado(id)" para usar el controlador "listar_reportes_empelado"
-router.get('/Empleados_report/:empleado', function(req,res){
-
-    controllerbd.listar_reportes_empleado(req,res);
-
-})
-
 
 router.get('/Numero_folio/:condicion', function(req,res){
 
@@ -45,6 +38,12 @@ router.get('/reportes_area/responsable/:area',function(req,res){
 router.get('/todos_reportes/open', function(req,res){
 
     controllerbd. listar_all_reports_open(req,res);
+
+})
+
+router.get('/validacion/:num_room', function(req,res){
+
+    controllerbd.validar_num_room(req,res);
 
 })
 
