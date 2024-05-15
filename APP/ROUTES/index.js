@@ -8,12 +8,14 @@ var report_incidents=require('./reportes_incidencias');
 var incidencias=require('./tipos_incidencias');
 var areas_hotel=require('./areas_hotel');
 var empleados=require('./empleados');
+var usuarios=require('./usuarios')
 
 //aqui se defina a que carpeta se iran en caso de que teclen las rutas entre comillas simples
 router.use('/Incidencias',incidencias);
 router.use('/Reporte',report_incidents);
 router.use('/Areas_h',areas_hotel);
 router.use('/Empleados',empleados);
+router.use('/Usuarios',usuarios)
 
 //se usa una ruta indice que da la bienvenida a la api
 

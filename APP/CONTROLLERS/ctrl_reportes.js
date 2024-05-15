@@ -22,7 +22,8 @@ module.exports={
         let em_vacio=0;
         let time_2=req.body.time_2;
         let observaciones=req.body.observaciones;
-        mysql.query(`insert into reportes_clientes (fecha_hora_report, numero_habitacion, problema, observaciones, estado, area, hora_alta, responsable,  hora_proceso, hora_cierre, hora_inconcluso, comentarios, nom_responsable_cierre) values ('${time_2}', ${num_room},'${Incidencia}','${observaciones}','${estado}',${area},'${time}',${em_vacio},'${vacio}','${vacio}','${vacio}','${vacio}',${em_vacio})`, function(err,result,fields){
+        let user_alta=req.body.user_alta;
+        mysql.query(`insert into reportes_clientes (fecha_hora_report, numero_habitacion, problema, observaciones, estado, area, hora_alta, responsable,  hora_proceso, hora_cierre, hora_inconcluso, comentarios, nom_responsable_cierre,u_alta,u_proceso,u_cierre) values ('${time_2}', ${num_room},'${Incidencia}','${observaciones}','${estado}',${area},'${time}',${em_vacio},'${vacio}','${vacio}','${vacio}','${vacio}',${em_vacio},'${user_alta}','${vacio}','${vacio}')`, function(err,result,fields){
             if(err){
                 res.json(err);
             }
@@ -55,7 +56,8 @@ module.exports={
         let empleado=req.body.id_empleado;
         let tiempo=req.body.tiempo;
         let estado=req.body.estatus;
-        mysql.query(`UPDATE reportes_clientes SET responsable = ${empleado}, estado='${estado}', hora_proceso='${tiempo}' WHERE id_report = ${id_reporte}`,function(err,result,fields){
+        let user_process=req.body.user_process;
+        mysql.query(`UPDATE reportes_clientes SET responsable = ${empleado}, estado='${estado}', hora_proceso='${tiempo}',u_proceso='${user_process}' WHERE id_report = ${id_reporte}`,function(err,result,fields){
             if(err){
                 res.json(err);
             }else{
@@ -77,7 +79,7 @@ module.exports={
             mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
             reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
             reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
-            reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, 
+            reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, reportes_clientes.u_alta, reportes_clientes.u_proceso,reportes_clientes.u_cierre,
             empleado_2.apellido_p as cierr_p, empleado_2.apellido_m as cierr_m, empleado_2.nombres as cierr_n
             FROM (((reportes_clientes
             LEFT JOIN empleados as empleado_1 ON empleado_1.id_empleado= reportes_clientes.responsable)
@@ -96,7 +98,7 @@ module.exports={
             mysql.query(`SELECT reportes_clientes.id_report, reportes_clientes.fecha_hora_report, reportes_clientes.numero_habitacion, 
             reportes_clientes.problema, reportes_clientes.observaciones ,areas_hotel.nombre_de_area, empleado_1.apellido_p, empleado_1.apellido_m, empleado_1.nombres, 
             reportes_clientes.estado,reportes_clientes.hora_alta,reportes_clientes.hora_proceso,
-            reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, 
+            reportes_clientes.hora_cierre,reportes_clientes.hora_inconcluso,reportes_clientes.comentarios, reportes_clientes.u_alta, reportes_clientes.u_proceso,reportes_clientes.u_cierre,
             empleado_2.apellido_p as cierr_p, empleado_2.apellido_m as cierr_m, empleado_2.nombres as cierr_n
             FROM (((reportes_clientes
             LEFT JOIN empleados as empleado_1 ON empleado_1.id_empleado= reportes_clientes.responsable)
@@ -129,11 +131,12 @@ module.exports={
         let empleado=req.body.empleado;
         let comentarios=req.body.comentarios;
         let time=req.body.time;
+        let user_end=req.body.user_end;
 
         //se crea una condicional en donde si el estado es "cerrado" se ejecuta sentencia
         if(estado_final=="Cerrado"){
 
-            mysql.query(`UPDATE reportes_clientes SET estado = '${estado_final}', hora_cierre='${time}', hora_inconcluso='- - -',comentarios='${comentarios}',nom_responsable_cierre=${empleado} WHERE id_report = ${id}`,function(err,result,fields){
+            mysql.query(`UPDATE reportes_clientes SET estado = '${estado_final}', hora_cierre='${time}', hora_inconcluso='- - -',comentarios='${comentarios}',nom_responsable_cierre=${empleado},u_cierre='${user_end}' WHERE id_report = ${id}`,function(err,result,fields){
                 if(err){
                     res.json(err);
                 }else{
@@ -143,7 +146,7 @@ module.exports={
         //en caso contrario se ejecutara la siguienbte sentencia
         }else if(estado_final=="Inconcluso"){
 
-            mysql.query(`UPDATE reportes_clientes SET estado = '${estado_final}',hora_cierre='- - -',hora_inconcluso='${time}',comentarios='${comentarios}',nom_responsable_cierre=${empleado} WHERE id_report = ${id}`,function(err,result,fields){
+            mysql.query(`UPDATE reportes_clientes SET estado = '${estado_final}',hora_cierre='- - -',hora_inconcluso='${time}',comentarios='${comentarios}',nom_responsable_cierre=${empleado},u_cierre='${user_end}' WHERE id_report = ${id}`,function(err,result,fields){
                 if(err){
                     res.json(err);
                 }else{
@@ -243,6 +246,36 @@ module.exports={
                 res.json(result);
             }
         })
+
+
+    },
+
+    validar_user_process:(req,res)=>{
+        let id_reporte=req.params.id_reporte;
+
+        mysql.query(`select u_proceso from reportes_clientes where id_report=${id_reporte}`,function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+
+
+
+    },
+
+    validar_user_end:(req,res)=>{
+        let id_reporte=req.params.id_reporte;
+
+        mysql.query(`select u_cierre from reportes_clientes where id_report=${id_reporte}`,function(err,result,fields){
+            if(err){
+                res.json(err);
+            }else{
+                res.json(result);
+            }
+        })
+
 
 
     }

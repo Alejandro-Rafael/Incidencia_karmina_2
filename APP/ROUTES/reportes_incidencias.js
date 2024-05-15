@@ -47,6 +47,17 @@ router.get('/validacion/:num_room', function(req,res){
 
 })
 
+router.get('/validacion/user_process/:id_reporte', function(req,res){
+
+    controllerbd.validar_user_process(req,res);
+
+})
+
+router.get('/validacion/user_end/:id_reporte', function(req,res){
+
+    controllerbd.validar_user_end(req,res);
+
+})
 
 //esta ruta de tipo "post" usa el controlador "agregar_reportes"
 router.post('/',function(req,res){
